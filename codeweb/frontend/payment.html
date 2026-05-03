@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thanh Toán An Toàn - VéXeAZ</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .payment-container {
+        max-width: 600px;
+        margin: 60px auto;
+        background: var(--white);
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+        border: 1px solid var(--border-color);
+      }
+      .payment-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 30px;
+        text-align: left;
+      }
+      .method-card {
+        border: 2px solid var(--border-color);
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+      .method-card:hover,
+      .method-card.selected {
+        border-color: var(--primary-color);
+        background-color: rgba(37, 99, 235, 0.05);
+      }
+      .method-card img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+      }
+      .vnpay-logo {
+        color: #005a9c;
+        font-weight: 800;
+        font-size: 1.5rem;
+        letter-spacing: -1px;
+      }
+      .vnpay-logo span {
+        color: #e50012;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <nav class="navbar">
+      <div class="container">
+        <a href="index.html" class="logo"
+          ><i class="fa-solid fa-bus"></i> VéXeAZ</a
+        >
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="payment-container" id="paymentContent">
+        <h2 style="margin-bottom: 20px; color: var(--text-dark)">
+          Chọn Phương Thức Thanh Toán
+        </h2>
+        <p>
+          Vui lòng hoàn tất thanh toán trong thời gian
+          <strong style="color: var(--secondary-color)">10:00</strong> phút.
+        </p>
+        <h3
+          style="margin-top: 20px; font-size: 2rem; color: var(--primary-color)"
+          id="paymentAmount"
+        >
+          ... đ
+        </h3>
+
+        <div class="payment-methods">
+          <div class="method-card selected" data-method="vnpay">
+            <div class="vnpay-logo">VN<span>PAY</span></div>
+            <div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 5px">
+                Thanh toán qua VNPAY
+              </h4>
+              <p style="color: var(--text-light); font-size: 0.9rem">
+                Hỗ trợ thẻ ATM, Mobile Banking, Visa, Mastercard
+              </p>
+            </div>
+            <i
+              class="fa-solid fa-circle-check"
+              style="
+                margin-left: auto;
+                color: var(--primary-color);
+                font-size: 1.5rem;
+              "
+            ></i>
+          </div>
+
+          <div class="method-card" data-method="momo">
+            <div
+              style="
+                width: 50px;
+                height: 50px;
+                background: #a50064;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 700;
+              "
+            >
+              MoMo
+            </div>
+            <div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 5px">
+                Thanh toán qua Ví MoMo
+              </h4>
+              <p style="color: var(--text-light); font-size: 0.9rem">
+                Quét mã QR qua ứng dụng MoMo
+              </p>
+            </div>
+            <i
+              class="fa-regular fa-circle"
+              style="margin-left: auto; color: #cbd5e1; font-size: 1.5rem"
+            ></i>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="btnPay"
+          style="
+            width: 100%;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 1.2rem;
+          "
+        >
+          Thanh Toán Ngay
+        </button>
+      </div>
+
+      <div
+        id="processing"
+        style="display: none; text-align: center; padding: 100px"
+      >
+        <i
+          class="fa-solid fa-spinner fa-spin fa-3x"
+          style="color: var(--primary-color)"
+        ></i>
+        <h3 style="margin-top: 20px">Đang kết nối cổng thanh toán...</h3>
+        <p style="color: var(--text-light); margin-top: 10px">
+          Vui lòng không đóng trình duyệt!
+        </p>
+      </div>
+
+      <div
+        id="success"
+        style="
+          display: none;
+          text-align: center;
+          padding: 80px;
+          max-width: 600px;
+          margin: 40px auto;
+          background: var(--white);
+          border-radius: 16px;
+          box-shadow: var(--shadow-lg);
+        "
+      >
+        <i
+          class="fa-solid fa-circle-check fa-5x"
+          style="color: #10b981; margin-bottom: 20px"
+        ></i>
+        <h2 style="color: #10b981; margin-bottom: 15px">
+          Thanh Toán Thành Công!
+        </h2>
+
+        <h3 style="margin-top: 20px">QR Vé Của Bạn</h3>
+        <div id="ticketContainer" style="margin-top: 20px"></div>
+        <p
+          style="
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+          "
+        >
+          Vé của bạn đã được xác nhận. Thông tin vé sẽ được gửi qua email/SMS.
+        </p>
+        <div
+          style="
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: left;
+          "
+        >
+          <p style="margin-bottom: 10px">
+            <strong>Mã vé:</strong>
+            <span
+              style="
+                font-family: monospace;
+                color: var(--primary-color);
+                font-size: 1.2rem;
+                font-weight: bold;
+              "
+              >VXA-88992</span
+            >
+          </p>
+          <p><strong>Ngày giờ mua:</strong> <span id="purchaseTime"></span></p>
+        </div>
+        <a href="index.html" class="btn btn-primary">Trở Về Trang Chủ</a>
+      </div>
+    </div>
+
+    <script src="js/payment.js"></script>
+    <script>
+      async function loadTickets() {
+        const params = new URLSearchParams(window.location.search);
+        const bookingId = params.get("bookingId");
+
+        if (!bookingId) return;
+
+        const res = await fetch(
+          `http://localhost:5000/api/tickets/${bookingId}`,
+        );
+        const tickets = await res.json();
+
+        const container = document.getElementById("ticketContainer");
+
+        tickets.forEach((ticket) => {
+          const div = document.createElement("div");
+
+          div.innerHTML = `
+      <h3>Ghế ${ticket.SeatLabel}</h3>
+      <img src="${ticket.QRCode}" width="150">
+    `;
+
+          container.appendChild(div);
+        });
+      }
+
+      loadTickets();
+    </script>
+  </body>
+</html>

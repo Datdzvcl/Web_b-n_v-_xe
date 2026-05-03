@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký - VéXeAZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><i class="fa-solid fa-bus"></i> VéXeAZ</a>
+        </div>
+    </nav>
+
+    <div class="container" style="display:flex; justify-content:center; align-items:center; min-height:80vh; padding: 40px 0;">
+        <div style="background:var(--white); padding:40px; border-radius:16px; box-shadow:var(--shadow-lg); width:100%; max-width:450px; border: 1px solid var(--border-color);">
+            <div style="text-align:center; margin-bottom:30px;">
+                <h2 style="color:var(--primary-color)"><i class="fa-solid fa-bus"></i> VéXeAZ</h2>
+                <p style="color:var(--text-light); margin-top:10px;">Tạo tài khoản mới</p>
+            </div>
+            
+            <form id="registerForm">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Họ và tên</label>
+                    <input type="text" id="regFullName" placeholder="Nhập họ và tên" required style="width:100%; padding:14px; border:1px solid var(--border-color); border-radius:8px; font-family:inherit;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Email</label>
+                    <input type="email" id="regEmail" placeholder="Nhập email" required style="width:100%; padding:14px; border:1px solid var(--border-color); border-radius:8px; font-family:inherit;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Số điện thoại</label>
+                    <input type="tel" id="regPhone" placeholder="Nhập số điện thoại" required style="width:100%; padding:14px; border:1px solid var(--border-color); border-radius:8px; font-family:inherit;">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Mật khẩu</label>
+                    <input type="password" id="regPassword" placeholder="Tạo mật khẩu" required style="width:100%; padding:14px; border:1px solid var(--border-color); border-radius:8px; font-family:inherit;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Xác nhận mật khẩu</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Nhập lại mật khẩu" required style="width:100%; padding:14px; border:1px solid var(--border-color); border-radius:8px; font-family:inherit;">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:1.1rem; justify-content:center;">Đăng Ký Ngay</button>
+            </form>
+            
+            <p style="text-align:center; margin-top:30px; font-size: 0.95rem; color:var(--text-dark);">
+                Đã có tài khoản? <a href="login.html" style="color:var(--primary-color); font-weight:700;">Đăng nhập</a>
+            </p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('regFullName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                return Swal.fire('Lỗi', 'Mật khẩu xác nhận không khớp.', 'error');
+            }
+
+            try {
+                const res = await fetch('http://localhost:5000/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, email, phone, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Đăng ký thành công',
+                        text: 'Vui lòng đăng nhập để tiếp tục.',
+                    }).then(() => {
+                        window.location.href = "login.html";
+                    });
+                } else {
+                    Swal.fire('Lỗi', data.message || 'Đăng ký thất bại', 'error');
+                }
+            } catch(err) {
+                console.error(err);
+                Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

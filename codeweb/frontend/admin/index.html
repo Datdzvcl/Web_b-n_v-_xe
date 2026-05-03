@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>VéXeAZ - Admin Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      .admin-layout {
+        display: flex;
+        min-height: 100vh;
+        background: var(--bg-light);
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        background: #111827;
+        color: white;
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      .sidebar-logo {
+        padding: 0 20px 20px;
+        font-size: 1.5rem;
+        font-weight: 800;
+        border-bottom: 1px solid #374151;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+      }
+      .sidebar-menu {
+        list-style: none;
+        flex: 1;
+      }
+      .sidebar-menu a {
+        display: block;
+        padding: 15px 20px;
+        color: #9ca3af;
+        transition: var(--transition);
+        border-left: 4px solid transparent;
+      }
+      .sidebar-menu a:hover,
+      .sidebar-menu a.active {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+        border-left-color: var(--primary-color);
+      }
+      .sidebar-menu i {
+        margin-right: 15px;
+        width: 20px;
+      }
+      .logout-btn {
+        padding: 20px;
+        border-top: 1px solid #374151;
+      }
+      .logout-btn a {
+        color: #ef4444;
+      }
+      .logout-btn a:hover {
+        color: #dc2626;
+        border-left-color: #ef4444;
+      }
+
+      .main-content {
+        position: relative;
+        margin-left: 260px;
+        margin-top: 70px;
+        padding: 30px;
+        width: calc(100% - 260px);
+        box-sizing: border-box;
+      }
+      .top-navbar {
+        position: fixed;
+        top: 0;
+        left: 260px;
+        right: 0;
+        height: 70px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 15px 30px;
+        box-shadow: var(--shadow-sm);
+        z-index: 999;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-left: 5px solid var(--primary-color);
+      }
+      .stat-info h4 {
+        color: var(--text-light);
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+        font-weight: 700;
+      }
+      .stat-info h2 {
+        font-size: 2rem;
+        color: var(--text-dark);
+        font-weight: 800;
+      }
+
+      .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        padding: 20px;
+        overflow-x: auto;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .table th,
+      .table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .table th {
+        color: var(--text-light);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+      }
+      .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+      .badge-success {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .badge-warning {
+        background: #fef9c3;
+        color: #854d0e;
+      }
+
+      /* SPA Sections */
+      .content-section {
+        display: none;
+      }
+      .content-section.active {
+        display: block;
+      }
+
+      /* Modals */
+      .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .modal.flex {
+        display: flex;
+      }
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 500px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+      }
+      .flex-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .btn-sm {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+      }
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+        border: none;
+      }
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      .filter-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .filter-bar input,
+      .filter-bar select {
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+
+      .filter-bar button {
+        padding: 8px 12px;
+        border: none;
+        background: #ff6600;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-logo">
+          <i class="fa-solid fa-bus"></i> VéXeAZ Admin
+        </div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#" id="menu-dashboard" class="active"
+              ><i class="fa-solid fa-chart-pie"></i> Tổng quan</a
+            >
+          </li>
+          <li>
+            <a href="#" id="menu-trips"
+              ><i class="fa-solid fa-route"></i> Chuyến Xe</a
+            >
+          </li>
+          <li>
+            <a href="#" id="menu-operators"
+              ><i class="fa-solid fa-building"></i> Nhà xe Đối tác</a
+            >
+          </li>
+          <li>
+            <a href="#" id="menu-users"
+              ><i class="fa-solid fa-users"></i> Khách hàng</a
+            >
+          </li>
+          <li>
+            <a href="#" id="menu-stats">
+              <i class="fa-solid fa-chart-line"></i> Thống kê
+            </a>
+          </li>
+        </ul>
+        <div class="logout-btn">
+          <a href="#" id="adminLogoutBtn"
+            ><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a
+          >
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="top-navbar">
+          <h2 id="pageTitle" style="color: var(--text-dark); font-weight: 800">
+            Bảng Điều Khiển
+          </h2>
+          <div style="display: flex; align-items: center; gap: 15px">
+            <div style="text-align: right">
+              <p style="font-weight: 700; font-size: 0.95rem">Quản trị viên</p>
+              <p style="color: var(--text-light); font-size: 0.8rem">
+                admin@vexeaz.com
+              </p>
+            </div>
+            <div
+              style="
+                width: 45px;
+                height: 45px;
+                background: var(--primary-color);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 700;
+                font-size: 1.2rem;
+              "
+            >
+              A
+            </div>
+          </div>
+        </div>
+
+        <!-- DASHBOARD SECTION -->
+        <div id="sec-dashboard" class="content-section active">
+          <!-- Stats -->
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-info">
+                <h4>DOANH THU THÁNG</h4>
+                <h2 id="totalRevenue">0đ</h2>
+              </div>
+              <i class="fa-solid fa-wallet fa-2x" style="color: #d1d5db"></i>
+            </div>
+            <div class="stat-card" style="border-color: #10b981">
+              <div class="stat-info">
+                <h4>VÉ ĐÃ BÁN</h4>
+                <h2 id="ticketsSold">0</h2>
+              </div>
+              <i class="fa-solid fa-ticket fa-2x" style="color: #d1d5db"></i>
+            </div>
+            <div class="stat-card" style="border-color: #f59e0b">
+              <div class="stat-info">
+                <h4>CHUYẾN ĐANG CHẠY</h4>
+                <h2 id="activeTrips">0</h2>
+              </div>
+              <i class="fa-solid fa-route fa-2x" style="color: #d1d5db"></i>
+            </div>
+            <div class="stat-card" style="border-color: #8b5cf6">
+              <div class="stat-info">
+                <h4>NHÀ XE ĐỐI TÁC</h4>
+                <h2 id="totalOperators">0</h2>
+              </div>
+              <i class="fa-solid fa-building fa-2x" style="color: #d1d5db"></i>
+            </div>
+          </div>
+
+          <!-- Recent Bookings -->
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+            "
+          >
+            <h3 style="color: var(--text-dark); font-weight: 800">
+              Giao Dịch Gần Đây
+            </h3>
+            <button
+              id="btnViewAllBookings"
+              class="btn btn-outline"
+              style="padding: 8px 16px; font-size: 0.9rem"
+            >
+              Xem tất cả
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Mã Đơn</th>
+                  <th>Khách Hàng</th>
+                  <th>Chuyến</th>
+                  <th>Ngày Đặt</th>
+                  <th>Số Tiền</th>
+                  <th>Trạng Thái</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="recentBookingsTable">
+                <!-- Dynamic content -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- End Dashboard Section -->
+
+        <div id="sec-bookings" class="content-section">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+            "
+          >
+            <h3 style="font-weight: 800">Tất cả giao dịch</h3>
+            <button id="backToDashboard" class="btn btn-outline">
+              ← Quay lại
+            </button>
+          </div>
+
+          <div style="margin-bottom: 15px">
+            <select id="bookingFilter" style="padding: 8px; border-radius: 6px">
+              <option value="all">Tất cả</option>
+              <option value="Pending">Chờ xử lý</option>
+              <option value="Paid">Đã thanh toán</option>
+              <option value="Cancelled">Đã huỷ</option>
+            </select>
+          </div>
+
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Mã Đơn</th>
+                  <th>Khách</th>
+                  <th>Chuyến</th>
+                  <th>Ngày</th>
+                  <th>Tiền</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="allBookingsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="sec-stats" class="content-section">
+          <h3 style="font-weight: 800; margin-bottom: 20px">Thống kê</h3>
+
+          <!-- FILTER -->
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              margin-bottom: 20px;
+              flex-wrap: wrap;
+            "
+          >
+            <select id="statType">
+              <option value="date">Theo ngày</option>
+              <option value="month">Theo tháng</option>
+              <option value="year">Theo năm</option>
+            </select>
+
+            <select id="statGroup">
+              <!-- <option value="operator">Nhà xe</option> -->
+              <option value="customer">Khách hàng</option>
+              <option value="bus">Loại xe</option>
+            </select>
+
+            <input type="date" id="statDate" />
+
+            <button onclick="loadStats()" class="btn btn-primary">
+              Xem thống kê
+            </button>
+          </div>
+
+          <!-- SỐ LIỆU -->
+          <div class="stat-grid" id="statsSummary"></div>
+
+          <!-- BIỂU ĐỒ -->
+          <div
+            style="
+              background: white;
+              padding: 20px;
+              border-radius: 12px;
+              margin-bottom: 20px;
+            "
+          >
+            <canvas id="statsChart"></canvas>
+          </div>
+
+          <!-- TABLE -->
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Mã đơn</th>
+                  <th>Khách</th>
+                  <th>Chuyến</th>
+                  <th>Tiền</th>
+                  <th>Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody id="statsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TRIPS SECTION -->
+        <div id="sec-trips" class="content-section">
+          <div class="flex-between">
+            <h3 style="font-weight: 800">Quản lý Chuyến Xe</h3>
+            <button class="btn btn-primary" onclick="showModal('tripModal')">
+              <i class="fa-solid fa-plus"></i> Thêm Chuyến
+            </button>
+          </div>
+
+          <div class="filter-bar">
+            <input type="date" id="filterDate" />
+
+            <select id="filterType">
+              <option value="">-- Loại xe --</option>
+              <option value="Limousine">Limousine</option>
+              <option value="Giường nằm">Giường nằm</option>
+              <!-- <option value="Ghế ngồi">Ghế ngồi</option> -->
+            </select>
+
+            <input
+              type="text"
+              id="searchPartner"
+              placeholder="Tìm theo nhà xe..."
+            />
+
+            <button id="btnFilter">Lọc</button>
+            <button id="btnReset">Reset</button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nhà Xe</th>
+                  <th>Biển Số</th>
+                  <th>Tuyến Đường</th>
+                  <th>Khởi Hành</th>
+                  <th>Giá Vé</th>
+                  <th>Seat</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="tripsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- OPERATORS SECTION -->
+        <div id="sec-operators" class="content-section">
+          <div class="flex-between">
+            <h3 style="font-weight: 800">Quản lý Nhà Xe</h3>
+            <button
+              class="btn btn-primary"
+              onclick="showModal('operatorModal')"
+            >
+              <i class="fa-solid fa-plus"></i> Thêm Nhà Xe
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tên Nhà Xe</th>
+                  <th>Mô Tả</th>
+                  <th>Điện Thoại</th>
+                  <th>Email</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="operatorsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- USERS SECTION -->
+        <div id="sec-users" class="content-section">
+          <div class="flex-between">
+            <h3 style="font-weight: 800">Quản lý Khách Hàng</h3>
+          </div>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tên</th>
+                  <th>Email</th>
+                  <th>Điện Thoại</th>
+                  <th>Vai Trò</th>
+                  <th>Ngày Đăng Ký</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals Placeholders -->
+    <div id="operatorModal" class="modal">
+      <div class="modal-content">
+        <h3 style="margin-bottom: 20px">Thêm Nhà Xe Mới</h3>
+        <form id="formOperator">
+          <div class="form-group">
+            <label>Tên Nhà Xe</label><input type="text" id="opName" required />
+          </div>
+          <div class="form-group">
+            <label>Mô tả ngắn</label><input type="text" id="opDesc" />
+          </div>
+          <div class="form-group">
+            <label>Điện thoại</label><input type="text" id="opPhone" required />
+          </div>
+          <div class="form-group">
+            <label>Email</label><input type="email" id="opEmail" />
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              gap: 10px;
+              margin-top: 20px;
+            "
+          >
+            <button
+              type="button"
+              class="btn btn-outline"
+              onclick="closeModal('operatorModal')"
+            >
+              Hủy
+            </button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="tripModal" class="modal">
+      <div class="modal-content">
+        <h3 style="margin-bottom: 20px">Thêm Chuyến Xe Mới</h3>
+        <form id="formTrip">
+          <div class="form-group">
+            <label>Mã ID Xe (BusID)</label
+            ><input type="number" id="trBus" required />
+          </div>
+          <div class="form-group">
+            <label>Điểm đi</label><input type="text" id="trDep" required />
+          </div>
+          <div class="form-group">
+            <label>Điểm đến</label><input type="text" id="trArr" required />
+          </div>
+          <div class="form-group">
+            <label>Giờ khởi hành (VD: 2024-12-01T08:00)</label
+            ><input type="datetime-local" id="trDepTime" required />
+          </div>
+          <div class="form-group">
+            <label>Giờ đến</label
+            ><input type="datetime-local" id="trArrTime" required />
+          </div>
+          <div class="form-group">
+            <label>Giá vé (VND)</label
+            ><input type="number" id="trPrice" required />
+          </div>
+          <div class="form-group">
+            <label>Số chỗ còn trống</label
+            ><input type="number" id="trSeats" required />
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              gap: 10px;
+              margin-top: 20px;
+            "
+          >
+            <button
+              type="button"
+              class="btn btn-outline"
+              onclick="closeModal('tripModal')"
+            >
+              Hủy
+            </button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/admin.js"></script>
+  </body>
+</html>

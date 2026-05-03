@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vé Xe AZ - Đặt Vé Xe Khách Nhanh Chóng</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-bus"></i> VéXeAZ
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Trang chủ</a>
+                <a href="#about">Giới thiệu</a>
+                <a href="search.html">Tìm chuyến</a>
+                <a href="#contact">Liên hệ</a>
+            </div>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline" id="loginBtn">Đăng nhập</a>
+                <a href="register.html" class="btn btn-primary" id="registerBtn">Đăng ký</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content container">
+            <h1>Hành trình của bạn, ưu tiên của chúng tôi</h1>
+            <p>Đặt vé xe khách trực tuyến dễ dàng, an toàn và nhanh chóng. Hơn 2000 nhà xe trên toàn quốc.</p>
+            
+            <!-- Search Form -->
+            <div class="search-box">
+                <datalist id="locationList">
+                    <option value="Hà Nội"></option>
+                    <option value="TP Hồ Chí Minh"></option>
+                    <option value="Hải Phòng"></option>
+                    <option value="Đà Nẵng"></option>
+                    <option value="Cần Thơ"></option>
+                    <option value="An Giang"></option>
+                    <option value="Bà Rịa - Vũng Tàu"></option>
+                    <option value="Bắc Giang"></option>
+                    <option value="Bắc Kạn"></option>
+                    <option value="Bạc Liêu"></option>
+                    <option value="Bắc Ninh"></option>
+                    <option value="Bến Tre"></option>
+                    <option value="Bình Định"></option>
+                    <option value="Bình Dương"></option>
+                    <option value="Bình Phước"></option>
+                    <option value="Bình Thuận"></option>
+                    <option value="Cà Mau"></option>
+                    <option value="Cao Bằng"></option>
+                    <option value="Đắk Lắk"></option>
+                    <option value="Đắk Nông"></option>
+                    <option value="Điện Biên"></option>
+                    <option value="Đồng Nai"></option>
+                    <option value="Đồng Tháp"></option>
+                    <option value="Gia Lai"></option>
+                    <option value="Hà Giang"></option>
+                    <option value="Hà Nam"></option>
+                    <option value="Hà Tĩnh"></option>
+                    <option value="Hải Dương"></option>
+                    <option value="Hậu Giang"></option>
+                    <option value="Hòa Bình"></option>
+                    <option value="Hưng Yên"></option>
+                    <option value="Khánh Hòa"></option>
+                    <option value="Kiên Giang"></option>
+                    <option value="Kon Tum"></option>
+                </datalist>
+                <form id="searchForm" action="search.html" method="GET">
+                    <div class="input-group">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <input type="text" id="from" name="from" placeholder="Điểm đi (VD: TPHCM)" list="locationList" autocomplete="off" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-location-arrow"></i>
+                        <input type="text" id="to" name="to" placeholder="Điểm đến (VD: Đà Lạt)" list="locationList" autocomplete="off" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-regular fa-calendar"></i>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <button type="submit" class="btn btn-search">Tìm Vé Xe</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Popular Routes Section -->
+    <section class="popular-routes container section-padding">
+        <h2 class="section-title">Khám Phá Tuyến Đường Phổ Biến</h2>
+        <div class="grid routes-grid">
+            <div class="route-card">
+                <div class="route-img" style="background-color: #3b82f6; background-image: url('https://vcdn1-dulich.vnecdn.net/2022/06/03/cauvang-1654247842-9403-1654247849.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=Swd6JjpStebEzT6WARcoOA'); background-size: cover; background-position: center;"></div>
+                <div class="route-info">
+                    <h3>Hà Nội - Đà Nẵng</h3>
+                    <p>Từ 250.000đ</p>
+                </div>
+            </div>
+            <div class="route-card">
+                <div class="route-img" style="background-color: #f59e0b; background-image: url('https://cdn2.tuoitre.vn/471584752817336320/2023/4/18/tp-nha-trang-16818161974101240202452.jpeg'); background-size: cover; background-position: center;"></div>
+                <div class="route-info">
+                    <h3>Sài Gòn - Nha Trang</h3>
+                    <p>Từ 300.000đ</p>
+                </div>
+            </div>
+            <div class="route-card">
+                <div class="route-img" style="background-color: #10b981; background-image: url('https://booking.muongthanh.com/upload_images/images/H%60/sa-pa-thi-tran-trong-suong.jpg'); background-size: cover; background-position: center;"></div>
+                <div class="route-info">
+                    <h3>Hà Nội - Sapa</h3>
+                    <p>Từ 350.000đ</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Section / About -->
+    <section id="about" class="container section-padding">
+        <h2 class="section-title">Tại Sao Chọn VéXeAZ?</h2>
+        <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: center;">
+            <div class="info-card">
+                <i class="fa-solid fa-ticket fa-3x" style="color: var(--primary-color); margin-bottom: 20px;"></i>
+                <h3>Hơn 2000 Nhà Xe</h3>
+                <p>Mạng lưới phủ khắp 63 tỉnh thành, đa dạng sự lựa chọn cho chuyến đi của bạn.</p>
+            </div>
+            <div class="info-card">
+                <i class="fa-solid fa-shield-halved fa-3x" style="color: var(--primary-color); margin-bottom: 20px;"></i>
+                <h3>Thanh Toán An Toàn</h3>
+                <p>Hệ thống thanh toán bảo mật với VNPay, MoMo đảm bảo giao dịch an toàn 100%.</p>
+            </div>
+            <div class="info-card">
+                <i class="fa-solid fa-headset fa-3x" style="color: var(--primary-color); margin-bottom: 20px;"></i>
+                <h3>Hỗ Trợ 24/7</h3>
+                <p>Đội ngũ hỗ trợ khách hàng luôn sẵn sàng giải đáp mọi thắc mắc ngay lập tức.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-col">
+                <h3>VéXeAZ</h3>
+                <p>Nền tảng đặt vé xe khách trực tuyến cao cấp hàng đầu Việt Nam.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Liên Kết</h3>
+                <a href="#about">Về chúng tôi</a>
+                <a href="#">Nhà xe đối tác</a>
+                <a href="#">Hình thức thanh toán</a>
+            </div>
+            <div class="footer-col">
+                <h3>Hỗ Trợ</h3>
+                <a href="#">Hướng dẫn đặt vé</a>
+                <a href="#">Chính sách hoàn tiền</a>
+                <a href="#">Câu hỏi thường gặp</a>
+            </div>
+        </div>
+        <div class="footer-bottom text-center">
+            <p>&copy; 2024 VéXeAZ. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

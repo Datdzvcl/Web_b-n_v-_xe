@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tài xế - VéXeAZ</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/portal.css" />
+  </head>
+  <body>
+    <div class="portal-layout">
+      <aside class="portal-sidebar">
+        <div class="portal-logo"><i class="fa-solid fa-id-card"></i> Tài xế</div>
+        <ul class="portal-menu">
+          <li><a href="#" class="active" data-section="trips"><i class="fa-solid fa-route"></i>Chuyến được gán</a></li>
+        </ul>
+        <div class="portal-logout">
+          <a href="#" id="logoutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i>Đăng xuất</a>
+        </div>
+      </aside>
+
+      <main class="portal-main">
+        <header class="portal-topbar">
+          <h2>Chuyến được gán</h2>
+          <div id="userInfo"></div>
+        </header>
+
+        <div class="portal-content">
+          <p id="message" class="portal-message"></p>
+          <section id="section-trips" class="portal-section active">
+            <div class="portal-table-wrap">
+              <table class="portal-table">
+                <thead>
+                  <tr>
+                    <th>Mã</th>
+                    <th>Nhà xe</th>
+                    <th>Tuyến</th>
+                    <th>Xe</th>
+                    <th>Khởi hành</th>
+                    <th>Trạng thái</th>
+                    <th>Cập nhật</th>
+                  </tr>
+                </thead>
+                <tbody id="driverTripsTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/driver.js"></script>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+*.exe
+.gocache/
+.gomodcache/
+.gotelemetry/

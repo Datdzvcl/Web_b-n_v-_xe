@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Vé - VéXeAZ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .booking-layout { display: flex; gap: 40px; margin: 40px auto; max-width: 1000px;}
+        .booking-form-area { flex: 2; }
+        .booking-summary { flex: 1; background: var(--white); padding: 30px; border-radius: 16px; box-shadow: var(--shadow-md); height: fit-content; border: 1px solid var(--border-color); position: sticky; top: 100px;}
+        
+        .booking-card { background: var(--white); padding: 30px; border-radius: 16px; box-shadow: var(--shadow-sm); margin-bottom: 30px; border: 1px solid var(--border-color);}
+        .booking-card h3 { margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--bg-light); padding-bottom: 15px; font-weight: 700;}
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark);}
+        .form-group input, .form-group select { width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 1rem; transition: var(--transition);}
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);}
+        
+        .summary-trip { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed var(--border-color); }
+        .summary-trip h4 { font-size: 1.2rem; margin-bottom: 10px; color: var(--primary-color);}
+        .summary-trip p { margin-bottom: 5px; color: var(--text-dark); display: flex; justify-content: space-between;}
+        
+        .total-price { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; font-size: 1.3rem; font-weight: 800; color: var(--secondary-color);}
+        .btn-checkout { width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 12px; margin-top: 10px;}
+        
+        /* Seat Selection (Simulated Layout) */
+        .seat-map { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; justify-content: center; max-width: 300px; margin: 0 auto;}
+        .seat { padding: 10px; text-align: center; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: var(--transition); font-weight: 600;}
+        .seat:hover:not(.booked) { background-color: var(--primary-color); color: var(--white);}
+        .seat.selected { background-color: var(--primary-color); color: var(--white); border-color: var(--primary-color);}
+        .seat.booked { background-color: var(--bg-light); color: var(--text-light); cursor: not-allowed; opacity: 0.6;}
+        .seat.invisible { visibility: hidden; } /* For aisle */
+
+        @media (max-width: 768px) {
+            .booking-layout { flex-direction: column-reverse; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><i class="fa-solid fa-bus"></i> VéXeAZ</a>
+            <div class="nav-links">
+                <a href="index.html">Trang chủ</a>
+                <a href="search.html">Tìm chuyến</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container booking-layout" id="bookingMainContent" style="display: none;">
+        <!-- Left Column: Forms & Seats -->
+        <div class="booking-form-area">
+            
+            <div class="booking-card">
+                <h3><i class="fa-solid fa-couch" style="color:var(--primary-color)"></i> 1. Chọn chỗ ngồi</h3>
+                <p style="text-align: center; margin-bottom: 20px; color: var(--text-light);">Vui lòng click vào ghế bạn muốn chọn</p>
+                
+                <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; font-size: 0.9rem;">
+                    <span style="display:flex; align-items:center; gap:8px;"><div style="width:20px;height:20px;border:1px solid #e5e7eb; border-radius:4px;"></div> Còn trống</span>
+                    <span style="display:flex; align-items:center; gap:8px;"><div style="width:20px;height:20px;background:#2563eb; border-radius:4px;"></div> Đang chọn</span>
+                    <span style="display:flex; align-items:center; gap:8px;"><div style="width:20px;height:20px;background:#f3f4f6; border-radius:4px;"></div> Đã bán</span>
+                </div>
+
+                <!-- Seat Map will be injected by JS -->
+                <div class="seat-map" id="seatMap"></div>
+            </div>
+
+            <div class="booking-card">
+                <h3><i class="fa-regular fa-id-card" style="color:var(--primary-color)"></i> 2. Thông tin hành khách</h3>
+                <form id="passengerForm">
+                    <div class="form-group">
+                        <label for="fullName">Họ và tên *</label>
+                        <input type="text" id="fullName" placeholder="VD: Nguyễn Văn A" required>
+                    </div>
+                    <div style="display: flex; gap: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="phone">Số điện thoại *</label>
+                            <input type="tel" id="phone" placeholder="VD: 0912345678" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="VD: email@example.com">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+
+        <!-- Right Column: Summary -->
+        <div class="booking-summary">
+            <h3 style="font-weight: 800; text-align: center; margin-bottom: 20px; color: var(--text-dark);">THÔNG TIN CHUYẾN ĐI</h3>
+            <div class="summary-trip">
+                <h4 id="summaryRoute">Đang tải...</h4>
+                <p><strong>Ngày đi:</strong> <span id="summaryDate">...</span></p>
+                <p><strong>Giờ khởi hành:</strong> <span id="summaryTime">...</span></p>
+                <p><strong>Nhà xe:</strong> <span id="summaryOperator">...</span></p>
+                <p><strong>Loại xe:</strong> <span id="summaryBusType">...</span></p>
+            </div>
+            <div class="summary-details">
+                <p style="display: flex; justify-content: space-between; color: var(--text-dark); margin-bottom: 10px;">
+                    <span>Ghế đã chọn:</span>
+                    <span id="summarySeats" style="font-weight: 700; color: var(--primary-color);">Chưa chọn</span>
+                </p>
+                <p style="display: flex; justify-content: space-between; color: var(--text-dark);">
+                    <span>Đơn giá:</span>
+                    <span id="summaryPrice">...</span>
+                </p>
+            </div>
+            <div class="total-price">
+                <span>Tổng cộng:</span>
+                <span id="summaryTotal">0đ</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-checkout" id="btnContinue">Tiếp tục thanh toán <i class="fa-solid fa-chevron-right" style="margin-left: 5px;"></i></button>
+        </div>
+    </div>
+
+    <div id="loading" style="text-align: center; padding: 100px; font-size: 1.2rem;">
+        <i class="fa-solid fa-spinner fa-spin fa-2x"></i><br><br>Đang chuẩn bị trang đặt vé...
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/booking.js"></script>
+</body>
+</html>

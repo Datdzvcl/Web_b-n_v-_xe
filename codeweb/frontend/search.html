@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Tìm Kiếm - VéXeAZ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .search-header { background-color: var(--primary-color); color: var(--white); padding: 40px 0; }
+        .search-results-layout { display: flex; gap: 30px; margin-top: 40px; margin-bottom: 60px;}
+        .filters { width: 300px; background: var(--white); padding: 25px; border-radius: 16px; box-shadow: var(--shadow-md); height: fit-content; border: 1px solid var(--border-color);}
+        .results-container { flex: 1; display:flex; flex-direction: column; gap: 20px;}
+        .trip-card { background: var(--white); padding: 25px; border-radius: 16px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); transition: var(--transition);}
+        .trip-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--primary-color);}
+        .trip-info { display: flex; gap: 30px; align-items: center;}
+        .trip-time { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
+        .trip-details h4 { font-size: 1.3rem; margin-bottom: 5px; font-weight: 700;}
+        .price { font-size: 1.6rem; font-weight: 800; color: var(--secondary-color); margin-bottom: 15px; display: block; text-align: right;}
+        .book-btn { width: 100%; border-radius: 8px;}
+        .loading { text-align: center; padding: 50px; font-size: 1.2rem; color: var(--text-light); }
+        .error-msg { text-align: center; padding: 50px; color: #ef4444; font-weight: 600; font-size: 1.2rem; }
+        .filter-group { margin-bottom: 20px; }
+        .filter-group label { display: block; margin-bottom: 8px; cursor: pointer; color: var(--text-dark);}
+        
+        @media (max-width: 768px) {
+            .search-results-layout { flex-direction: column; }
+            .filters { width: 100%; }
+            .trip-card { flex-direction: column; align-items: stretch; gap: 20px;}
+            .trip-info { flex-direction: column; align-items: flex-start; gap: 10px;}
+            .price { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo"><i class="fa-solid fa-bus"></i> VéXeAZ</a>
+            <div class="nav-links">
+                <a href="index.html">Trang chủ</a>
+                <a href="search.html" style="color:var(--primary-color)">Tìm chuyến</a>
+            </div>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline" id="loginBtn">Đăng nhập</a>
+                <a href="register.html" class="btn btn-primary" id="registerBtn" style="margin-left: 10px;">Đăng ký</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="search-header">
+        <div class="container text-center">
+            <h2 id="searchTitle">Đang tìm chuyến xe...</h2>
+            <p id="searchSubTitle"></p>
+        </div>
+    </div>
+
+    <div class="container search-results-layout">
+        <aside class="filters">
+            <h3 style="font-weight: 700; margin-bottom: 5px;">BỘ LỌC TÌM KIẾM</h3>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid var(--border-color);">
+            <div class="filter-group">
+                <p style="font-weight: 600; margin-bottom: 10px;">Loại xe</p>
+                <label><input type="checkbox" class="filter-chk filter-bus" value="Giường nằm"> Giường nằm</label>
+                <label><input type="checkbox" class="filter-chk filter-bus" value="Limousine"> Limousine</label>
+            </div>
+            <div class="filter-group">
+                <p style="font-weight: 600; margin-bottom: 10px;">Nhà xe</p>
+                <label><input type="checkbox" class="filter-chk filter-op" value="Phương Trang"> Phương Trang</label>
+                <label><input type="checkbox" class="filter-chk filter-op" value="Thành Bưởi"> Thành Bưởi</label>
+                <label><input type="checkbox" class="filter-chk filter-op" value="Futa Buslines"> Futa Buslines</label>
+            </div>
+        </aside>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="loading"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><br><br>Đang tải dữ liệu chuyến xe...</div>
+        </div>
+    </div>
+
+    <script src="js/search.js"></script>
+</body>
+</html>
