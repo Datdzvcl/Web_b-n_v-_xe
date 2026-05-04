@@ -16,10 +16,10 @@
     <link rel="stylesheet" href="css/portal.css" />
   </head>
   <body>
-    <div class="portal-layout">
-      <aside class="portal-sidebar">
-        <div class="portal-logo"><i class="fa-solid fa-bus"></i> Nhà xe</div>
-        <ul class="portal-menu">
+    <div class="admin-layout portal-layout">
+      <aside class="sidebar portal-sidebar">
+        <div class="sidebar-logo portal-logo"><i class="fa-solid fa-bus"></i> VéXeAZ Nhà xe</div>
+        <ul class="sidebar-menu portal-menu">
           <li><a href="#" class="active" data-section="dashboard"><i class="fa-solid fa-chart-pie"></i>Tổng quan</a></li>
           <li><a href="#" data-section="fleet"><i class="fa-solid fa-bus-simple"></i>Đội xe</a></li>
           <li><a href="#" data-section="seatmap"><i class="fa-solid fa-border-all"></i>Sơ đồ ghế</a></li>
@@ -28,65 +28,82 @@
           <li><a href="#" data-section="bookings"><i class="fa-solid fa-ticket"></i>Đơn vé</a></li>
           <li><a href="#" data-section="reports"><i class="fa-solid fa-chart-line"></i>Thống kê</a></li>
         </ul>
-        <div class="portal-logout">
+        <div class="logout-btn portal-logout">
           <a href="#" id="logoutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i>Đăng xuất</a>
         </div>
       </aside>
 
       <main class="portal-main">
-        <header class="portal-topbar">
-          <h2 id="pageTitle">Tổng quan</h2>
+        <header class="top-navbar portal-topbar">
+          <h2 id="pageTitle">Bảng Điều Khiển</h2>
           <div id="userInfo"></div>
         </header>
 
-        <div class="portal-content">
-          <p id="message" class="portal-message"></p>
+        <div class="main-content portal-content">
 
-          <section id="section-dashboard" class="portal-section active">
-            <div class="portal-grid portal-stat-grid">
-              <div class="portal-card portal-stat-card">
-                <div>
-                  <h4>Đội xe</h4>
-                  <strong id="totalBuses">0</strong>
+          <section id="section-dashboard" class="content-section portal-section active">
+            <div class="stat-grid portal-grid portal-stat-grid">
+              <div class="stat-card portal-card portal-stat-card">
+                <div class="stat-info">
+                  <h4>DOANH THU THÁNG</h4>
+                  <h2 id="paidRevenue">0đ</h2>
                 </div>
-                <i class="fa-solid fa-bus-simple"></i>
+                <i class="fa-solid fa-wallet fa-2x"></i>
               </div>
-              <div class="portal-card portal-stat-card green">
-                <div>
-                  <h4>Chuyến xe</h4>
-                  <strong id="totalTrips">0</strong>
+              <div class="stat-card portal-card portal-stat-card green">
+                <div class="stat-info">
+                  <h4>VÉ ĐÃ BÁN</h4>
+                  <h2 id="totalBookings">0</h2>
                 </div>
-                <i class="fa-solid fa-route"></i>
+                <i class="fa-solid fa-ticket fa-2x"></i>
               </div>
-              <div class="portal-card portal-stat-card amber">
-                <div>
-                  <h4>Tài xế</h4>
-                  <strong id="totalDrivers">0</strong>
+              <div class="stat-card portal-card portal-stat-card amber">
+                <div class="stat-info">
+                  <h4>CHUYẾN ĐANG CHẠY</h4>
+                  <h2 id="totalTrips">0</h2>
                 </div>
-                <i class="fa-solid fa-id-card"></i>
+                <i class="fa-solid fa-route fa-2x"></i>
               </div>
-              <div class="portal-card portal-stat-card purple">
-                <div>
-                  <h4>Đơn vé</h4>
-                  <strong id="totalBookings">0</strong>
+              <div class="stat-card portal-card portal-stat-card purple">
+                <div class="stat-info">
+                  <h4>NHÀ XE ĐỐI TÁC</h4>
+                  <h2 id="totalBuses">0</h2>
                 </div>
-                <i class="fa-solid fa-ticket"></i>
+                <i class="fa-solid fa-building fa-2x"></i>
               </div>
-              <div class="portal-card portal-stat-card blue">
-                <div>
-                  <h4>Doanh thu đã thanh toán</h4>
-                  <strong id="paidRevenue">0đ</strong>
-                </div>
-                <i class="fa-solid fa-wallet"></i>
-              </div>
+            </div>
+
+            <div class="flex-between admin-section-heading">
+              <h3>Giao Dịch Gần Đây</h3>
+              <button id="operatorViewAllBookingsBtn" class="btn btn-outline" type="button">
+                Xem tất cả
+              </button>
+            </div>
+            <div class="table-container portal-table-wrap">
+              <table class="table portal-table">
+                <thead>
+                  <tr>
+                    <th>Mã Đơn</th>
+                    <th>Khách Hàng</th>
+                    <th>Chuyến</th>
+                    <th>Ngày Đặt</th>
+                    <th>Số Tiền</th>
+                    <th>Trạng Thái</th>
+                  </tr>
+                </thead>
+                <tbody id="operatorRecentBookingsTable"></tbody>
+              </table>
             </div>
           </section>
 
-          <section id="section-fleet" class="portal-section">
-            <div class="portal-toolbar">
-              <h3><i class="fa-solid fa-bus-simple"></i> Quản lý đội xe</h3>
+          <section id="section-fleet" class="content-section portal-section">
+            <div class="flex-between admin-section-heading">
+              <h3>Quản lý Đội Xe</h3>
+              <button id="toggleBusFormBtn" class="btn btn-primary" type="button">
+                <i class="fa-solid fa-plus"></i>Thêm Xe
+              </button>
             </div>
-            <div class="portal-card portal-form-card">
+            <div id="busFormPanel" class="portal-card portal-form-card admin-form-panel hidden">
               <form id="busForm" class="portal-form">
                 <div>
                   <label>Biển số</label>
@@ -107,12 +124,15 @@
                   <button class="btn btn-primary" type="submit">
                     <i class="fa-solid fa-plus"></i> Thêm xe
                   </button>
+                  <button class="btn btn-outline" type="button" id="cancelBusFormBtn">
+                    Hủy
+                  </button>
                 </div>
               </form>
             </div>
 
-            <div class="portal-table-wrap">
-              <table class="portal-table">
+            <div class="table-container portal-table-wrap">
+              <table class="table portal-table">
                 <thead>
                   <tr>
                     <th>Mã</th>
@@ -128,7 +148,7 @@
             </div>
           </section>
 
-          <section id="section-seatmap" class="portal-section">
+          <section id="section-seatmap" class="content-section portal-section">
             <div class="portal-toolbar">
               <h3><i class="fa-solid fa-border-all"></i> Định nghĩa sơ đồ ghế</h3>
             </div>
@@ -162,11 +182,19 @@
             <div id="seatMapPreview" class="seat-map-preview"></div>
           </section>
 
-          <section id="section-trips" class="portal-section">
-            <div class="portal-toolbar">
-              <h3><i class="fa-solid fa-route"></i> Quản lý Chuyến Xe</h3>
+          <section id="section-trips" class="content-section portal-section">
+            <div class="flex-between admin-section-heading">
+              <h3>Quản lý Chuyến Xe</h3>
+              <div class="admin-heading-actions">
+                <button id="toggleCloneTripBtn" class="btn btn-outline" type="button">
+                  <i class="fa-solid fa-copy"></i> Nhân bản lịch
+                </button>
+                <button id="toggleTripFormBtn" class="btn btn-primary" type="button">
+                  <i class="fa-solid fa-plus"></i>Thêm Chuyến
+                </button>
+              </div>
             </div>
-            <div class="portal-card portal-form-card">
+            <div id="tripFormPanel" class="portal-card portal-form-card admin-form-panel hidden">
               <form id="tripForm" class="portal-form">
                 <div>
                   <label>Xe</label>
@@ -209,13 +237,14 @@
                   <button class="btn btn-outline hidden" type="button" id="cancelTripEditBtn">
                     Hủy sửa
                   </button>
+                  <button class="btn btn-outline" type="button" id="closeTripFormBtn">
+                    Đóng
+                  </button>
                 </div>
               </form>
             </div>
-            <div class="portal-card portal-form-card">
-              <div class="portal-toolbar">
-                <h3><i class="fa-solid fa-copy"></i> Nhân bản lịch trình</h3>
-              </div>
+            <div id="cloneTripPanel" class="portal-card portal-form-card admin-form-panel hidden">
+              <h3 class="admin-panel-title"><i class="fa-solid fa-copy"></i> Nhân bản lịch trình</h3>
               <form id="cloneTripForm" class="portal-form">
                 <div>
                   <label>Chuyến gốc</label>
@@ -240,10 +269,13 @@
                   <button class="btn btn-outline" type="submit">
                     <i class="fa-solid fa-copy"></i> Nhân bản
                   </button>
+                  <button class="btn btn-outline" type="button" id="closeCloneTripBtn">
+                    Đóng
+                  </button>
                 </div>
               </form>
             </div>
-            <div class="portal-filter-bar">
+            <div class="filter-bar portal-filter-bar">
               <input type="date" id="operatorTripFilterDate" />
               <select id="operatorTripFilterType">
                 <option value="">-- Loại xe --</option>
@@ -253,24 +285,23 @@
               <input
                 type="text"
                 id="operatorTripSearch"
-                placeholder="Tìm tuyến, biển số, tài xế..."
+                placeholder="Tìm theo nhà xe..."
               />
               <button id="operatorTripFilterBtn" type="button">Lọc</button>
               <button id="operatorTripResetBtn" type="button">Reset</button>
             </div>
-            <div class="portal-table-wrap">
-              <table class="portal-table">
+            <div class="table-container portal-table-wrap">
+              <table class="table portal-table">
                 <thead>
                   <tr>
-                    <th>Mã</th>
-                    <th>Tuyến</th>
-                    <th>Xe</th>
-                    <th>Tài xế</th>
-                    <th>Khởi hành</th>
-                    <th>Giá</th>
-                    <th>Ghế</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
+                    <th>ID</th>
+                    <th>Nhà xe</th>
+                    <th>Biển số</th>
+                    <th>Tuyến Đường</th>
+                    <th>Khởi Hành</th>
+                    <th>Giá Vé</th>
+                    <th>Seat</th>
+                    <th>Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody id="tripsTable"></tbody>
@@ -278,11 +309,14 @@
             </div>
           </section>
 
-          <section id="section-drivers" class="portal-section">
-            <div class="portal-toolbar">
-              <h3><i class="fa-solid fa-id-card"></i> Quản lý tài xế</h3>
+          <section id="section-drivers" class="content-section portal-section">
+            <div class="flex-between admin-section-heading">
+              <h3>Quản lý Tài Xế</h3>
+              <button id="toggleDriverFormBtn" class="btn btn-primary" type="button">
+                <i class="fa-solid fa-plus"></i>Thêm Tài Xế
+              </button>
             </div>
-            <div class="portal-card portal-form-card">
+            <div id="driverFormPanel" class="portal-card portal-form-card admin-form-panel hidden">
               <form id="driverForm" class="portal-form">
                 <div>
                   <label>Họ tên</label>
@@ -304,19 +338,22 @@
                   <button class="btn btn-primary" type="submit">
                     <i class="fa-solid fa-user-plus"></i> Tạo tài xế
                   </button>
+                  <button class="btn btn-outline" type="button" id="cancelDriverFormBtn">
+                    Hủy
+                  </button>
                 </div>
               </form>
             </div>
-            <div class="portal-table-wrap">
-              <table class="portal-table">
+            <div class="table-container portal-table-wrap">
+              <table class="table portal-table">
                 <thead>
                   <tr>
-                    <th>Mã</th>
-                    <th>Tài xế</th>
+                    <th>ID</th>
+                    <th>Tên Tài Xế</th>
+                    <th>Mô Tả</th>
+                    <th>Điện Thoại</th>
                     <th>Email</th>
-                    <th>Điện thoại</th>
-                    <th>Bằng lái</th>
-                    <th>Trạng thái</th>
+                    <th>Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody id="driversTable"></tbody>
@@ -324,12 +361,12 @@
             </div>
           </section>
 
-          <section id="section-bookings" class="portal-section">
+          <section id="section-bookings" class="content-section portal-section">
             <div class="portal-toolbar">
               <h3><i class="fa-solid fa-ticket"></i> Đơn vé của nhà xe</h3>
             </div>
-            <div class="portal-table-wrap">
-              <table class="portal-table">
+            <div class="table-container portal-table-wrap">
+              <table class="table portal-table">
                 <thead>
                   <tr>
                     <th>Mã đơn</th>
@@ -346,7 +383,7 @@
             </div>
           </section>
 
-          <section id="section-reports" class="portal-section">
+          <section id="section-reports" class="content-section portal-section">
             <div class="portal-toolbar">
               <h3><i class="fa-solid fa-chart-line"></i> Thống kê doanh thu</h3>
             </div>
@@ -375,25 +412,25 @@
                 </div>
               </form>
             </div>
-            <div class="portal-grid portal-stat-grid">
-              <div class="portal-card portal-stat-card blue">
-                <div>
+            <div class="stat-grid portal-grid portal-stat-grid">
+              <div class="stat-card portal-card portal-stat-card blue">
+                <div class="stat-info">
                   <h4>Doanh thu</h4>
-                  <strong id="reportRevenue">0đ</strong>
+                  <h2 id="reportRevenue">0đ</h2>
                 </div>
                 <i class="fa-solid fa-wallet"></i>
               </div>
-              <div class="portal-card portal-stat-card green">
-                <div>
+              <div class="stat-card portal-card portal-stat-card green">
+                <div class="stat-info">
                   <h4>Đơn đã thanh toán</h4>
-                  <strong id="reportBookings">0</strong>
+                  <h2 id="reportBookings">0</h2>
                 </div>
                 <i class="fa-solid fa-ticket"></i>
               </div>
-              <div class="portal-card portal-stat-card amber">
-                <div>
+              <div class="stat-card portal-card portal-stat-card amber">
+                <div class="stat-info">
                   <h4>Ghế đã bán</h4>
-                  <strong id="reportSeats">0</strong>
+                  <h2 id="reportSeats">0</h2>
                 </div>
                 <i class="fa-solid fa-chair"></i>
               </div>
@@ -401,8 +438,8 @@
             <div class="portal-chart-card">
               <canvas id="revenueChart"></canvas>
             </div>
-            <div class="portal-table-wrap">
-              <table class="portal-table">
+            <div class="table-container portal-table-wrap">
+              <table class="table portal-table">
                 <thead>
                   <tr>
                     <th>Nhóm</th>

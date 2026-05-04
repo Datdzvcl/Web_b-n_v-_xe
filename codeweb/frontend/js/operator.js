@@ -12,9 +12,20 @@ const BUS_TYPES = {
   limousine: { label: "Limousine", capacity: 22 },
 };
 
+const SECTION_TITLES = {
+  dashboard: "Bảng Điều Khiển",
+  fleet: "Quản lý Đội Xe",
+  seatmap: "Định nghĩa sơ đồ ghế",
+  trips: "Quản lý Chuyến Xe",
+  drivers: "Quản lý Tài Xế",
+  bookings: "Đơn vé của nhà xe",
+  reports: "Thống kê doanh thu",
+};
+
 let drivers = [];
 let buses = [];
 let trips = [];
+let operatorBookings = [];
 let currentSeats = [];
 let editingTripId = null;
 let tripFilters = { date: "", type: "", keyword: "" };
@@ -30,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("logoutBtn").addEventListener("click", logout);
   bindNavigation();
   bindForms();
+  bindAdminLayoutControls();
   loadAll();
 });
 
@@ -64,7 +76,7 @@ function switchSection(section) {
   document.querySelectorAll(".portal-section").forEach((item) => item.classList.remove("active"));
   link.classList.add("active");
   document.getElementById(`section-${section}`).classList.add("active");
-  document.getElementById("pageTitle").textContent = link.textContent.trim();
+  document.getElementById("pageTitle").textContent = SECTION_TITLES[section] || link.textContent.trim();
 
   if (section === "trips") {
     renderCloneTripOptions();
@@ -97,6 +109,7 @@ function bindForms() {
 
     showMessage("Đã thêm xe và tạo sơ đồ ghế mặc định");
     event.target.reset();
+    hidePanel("busFormPanel");
     document.getElementById("busCapacity").value = BUS_TYPES.sleeper.capacity;
     await Promise.all([loadDashboard(), loadBuses()]);
   });
@@ -130,6 +143,7 @@ function bindForms() {
 
     showMessage(editingTripId ? "Đã cập nhật lịch và giá vé" : "Đã tạo chuyến xe");
     resetTripForm();
+    hidePanel("tripFormPanel");
     await Promise.all([loadDashboard(), loadTrips()]);
   });
 
@@ -201,12 +215,42 @@ function bindForms() {
 
     showMessage(`Tạo tài xế thành công. Mật khẩu mặc định: ${data.defaultPassword}`);
     event.target.reset();
+    hidePanel("driverFormPanel");
     await Promise.all([loadDashboard(), loadDrivers(), loadTrips()]);
   });
 
   document.getElementById("revenueReportForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     await loadRevenueReport();
+  });
+}
+
+function bindAdminLayoutControls() {
+  document.getElementById("operatorViewAllBookingsBtn")?.addEventListener("click", () => {
+    switchSection("bookings");
+  });
+  document.getElementById("toggleBusFormBtn")?.addEventListener("click", () => togglePanel("busFormPanel"));
+  document.getElementById("cancelBusFormBtn")?.addEventListener("click", () => {
+    document.getElementById("busForm").reset();
+    hidePanel("busFormPanel");
+  });
+  document.getElementById("toggleTripFormBtn")?.addEventListener("click", () => {
+    resetTripForm();
+    showPanel("tripFormPanel");
+  });
+  document.getElementById("closeTripFormBtn")?.addEventListener("click", () => {
+    resetTripForm();
+    hidePanel("tripFormPanel");
+  });
+  document.getElementById("toggleCloneTripBtn")?.addEventListener("click", () => {
+    renderCloneTripOptions();
+    togglePanel("cloneTripPanel");
+  });
+  document.getElementById("closeCloneTripBtn")?.addEventListener("click", () => hidePanel("cloneTripPanel"));
+  document.getElementById("toggleDriverFormBtn")?.addEventListener("click", () => togglePanel("driverFormPanel"));
+  document.getElementById("cancelDriverFormBtn")?.addEventListener("click", () => {
+    document.getElementById("driverForm").reset();
+    hidePanel("driverFormPanel");
   });
 }
 
@@ -222,11 +266,11 @@ async function loadDashboard() {
   const data = await request("/operator/dashboard");
   if (!data) return;
 
-  document.getElementById("totalBuses").textContent = data.totalBuses || 0;
-  document.getElementById("totalTrips").textContent = data.totalTrips || 0;
-  document.getElementById("totalDrivers").textContent = data.totalDrivers || 0;
-  document.getElementById("totalBookings").textContent = data.totalBookings || 0;
-  document.getElementById("paidRevenue").textContent = money(data.paidRevenue || 0);
+  setText("totalBuses", data.totalBuses || 0);
+  setText("totalTrips", data.totalTrips || 0);
+  setText("totalDrivers", data.totalDrivers || 0);
+  setText("totalBookings", data.totalBookings || 0);
+  setText("paidRevenue", money(data.paidRevenue || 0));
 }
 
 async function loadBuses() {
@@ -263,12 +307,12 @@ function renderBuses() {
           (bus) => `
             <tr>
               <td>XE-${bus.id}</td>
-              <td><strong>${escapeHtml(bus.licensePlate)}</strong></td>
+              <td><b>${escapeHtml(bus.licensePlate)}</b></td>
               <td>${escapeHtml(bus.busType)}</td>
               <td>${bus.capacity}</td>
               <td>${bus.seatCount || 0}/${bus.capacity}</td>
               <td>
-                <button class="portal-action-btn" type="button" onclick="openSeatMap(${bus.id})">
+                <button class="btn-sm btn-danger" type="button" onclick="openSeatMap(${bus.id})">
                   <i class="fa-solid fa-border-all"></i> Sơ đồ
                 </button>
               </td>
@@ -293,11 +337,15 @@ async function loadDrivers() {
           (driver) => `
             <tr>
               <td>TX-${driver.id}</td>
-              <td>${escapeHtml(driver.fullName)}</td>
-              <td>${escapeHtml(driver.email)}</td>
+              <td><b>${escapeHtml(driver.fullName)}</b></td>
+              <td>${escapeHtml(driver.licenseNumber)}<br><small>${escapeHtml(statusText(driver.status))}</small></td>
               <td>${escapeHtml(driver.phone)}</td>
-              <td>${escapeHtml(driver.licenseNumber)}</td>
-              <td><span class="portal-badge success">${escapeHtml(statusText(driver.status))}</span></td>
+              <td>${escapeHtml(driver.email)}</td>
+              <td>
+                <button class="btn-sm btn-danger" type="button" onclick="showDriverNotice()">
+                  <i class="fa-solid fa-eye"></i> Xem
+                </button>
+              </td>
             </tr>
           `,
         )
@@ -319,20 +367,19 @@ function renderTripsTable() {
         .map(
           (trip) => `
             <tr>
-              <td>CX-${trip.id}</td>
+              <td>IDX-${trip.id}</td>
+              <td><b>${escapeHtml(operatorDisplayName())}</b></td>
+              <td>${escapeHtml(trip.licensePlate || "")}</td>
               <td>${escapeHtml(trip.departureLocation)} - ${escapeHtml(trip.arrivalLocation)}</td>
-              <td>${escapeHtml(trip.licensePlate)}<br><small>${escapeHtml(trip.busType)}</small></td>
-              <td>${escapeHtml(trip.driverName || "Chưa gán")}</td>
               <td>${dateTime(trip.departureTime)}</td>
               <td>${money(trip.price)}</td>
-              <td>${trip.availableSeats}/${trip.capacity || trip.availableSeats}</td>
-              <td><span class="portal-badge ${badgeClass(trip.status)}">${escapeHtml(statusText(trip.status))}</span></td>
+              <td>${trip.availableSeats}</td>
               <td class="portal-actions">${tripControls(trip)}</td>
             </tr>
           `,
         )
         .join("")
-    : `<tr><td colspan="9" class="portal-empty">Không có dữ liệu chuyến xe phù hợp</td></tr>`;
+    : `<tr><td colspan="8" class="portal-empty">Không có dữ liệu chuyến xe phù hợp</td></tr>`;
 }
 
 function filteredTrips() {
@@ -345,6 +392,7 @@ function filteredTrips() {
     }
     if (tripFilters.keyword) {
       const haystack = [
+        operatorDisplayName(),
         trip.departureLocation,
         trip.arrivalLocation,
         trip.licensePlate,
@@ -377,10 +425,9 @@ function renderCloneTripOptions() {
 
 function tripControls(trip) {
   return `
-    <button class="portal-action-btn" type="button" onclick="editTrip(${trip.id})">
+    <button class="btn-sm btn-danger" type="button" onclick="editTrip(${trip.id})">
       <i class="fa-solid fa-pen-to-square"></i> Sửa
     </button>
-    ${driverAssignControl(trip)}
   `;
 }
 
@@ -412,6 +459,7 @@ window.editTrip = function (tripId) {
   document.getElementById("tripSubmitBtn").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Cập nhật lịch`;
   document.getElementById("cancelTripEditBtn").classList.remove("hidden");
   switchSection("trips");
+  showPanel("tripFormPanel");
 };
 
 window.assignDriver = async function (select) {
@@ -458,10 +506,12 @@ function setTripSeatsFromBus() {
 }
 
 async function loadBookings() {
-  const bookings = (await request("/operator/bookings")) || [];
+  operatorBookings = (await request("/operator/bookings")) || [];
+  renderRecentBookings(operatorBookings.slice(0, 7));
+
   const tbody = document.getElementById("bookingsTable");
-  tbody.innerHTML = bookings.length
-    ? bookings
+  tbody.innerHTML = operatorBookings.length
+    ? operatorBookings
         .map(
           (booking) => `
             <tr>
@@ -479,6 +529,28 @@ async function loadBookings() {
     : `<tr><td colspan="7" class="portal-empty">Chưa có đơn vé</td></tr>`;
 }
 
+function renderRecentBookings(bookings) {
+  const tbody = document.getElementById("operatorRecentBookingsTable");
+  if (!tbody) return;
+
+  tbody.innerHTML = bookings.length
+    ? bookings
+        .map(
+          (booking) => `
+            <tr>
+              <td style="font-family: monospace; font-weight: 600;">VXA-${10000 + Number(booking.id)}</td>
+              <td>${escapeHtml(booking.customerName)}<br><small>${escapeHtml(booking.customerPhone)}</small></td>
+              <td>${escapeHtml(booking.route)}</td>
+              <td>${dateOnly(booking.bookingDate)}</td>
+              <td style="font-weight: 600;">${money(booking.totalPrice)}</td>
+              <td><span class="badge ${adminBadgeClass(booking.status)}">${escapeHtml(statusText(booking.status))}</span></td>
+            </tr>
+          `,
+        )
+        .join("")
+    : `<tr><td colspan="6" class="portal-empty">Chưa có giao dịch gần đây</td></tr>`;
+}
+
 async function loadRevenueReport() {
   const form = document.getElementById("revenueReportForm");
   if (!form) return;
@@ -492,9 +564,16 @@ async function loadRevenueReport() {
   if (value("reportFrom")) params.set("from", value("reportFrom"));
   if (value("reportTo")) params.set("to", value("reportTo"));
 
-  const data = await request(`/operator/revenue?${params.toString()}`);
-  if (!data) return;
-  renderRevenueReport(data);
+  const data = await request(`/operator/revenue?${params.toString()}`, { silent: true });
+  if (data) {
+    renderRevenueReport(data);
+    showMessage("");
+    return;
+  }
+
+  const fallback = await buildRevenueReportFromBookings(value("reportGroupBy"), value("reportFrom"), value("reportTo"));
+  renderRevenueReport(fallback);
+  showMessage("");
 }
 
 function renderRevenueReport(data) {
@@ -509,6 +588,93 @@ function renderRevenueReport(data) {
     ? items.map((item) => revenueReportRow(data.groupBy, item)).join("")
     : `<tr><td colspan="5" class="portal-empty">Chưa có doanh thu đã thanh toán trong khoảng thời gian này</td></tr>`;
   renderRevenueChart(data.groupBy, items);
+}
+
+async function buildRevenueReportFromBookings(groupBy, fromDate, toDate) {
+  if (!operatorBookings.length) {
+    operatorBookings = (await request("/operator/bookings", { silent: true })) || [];
+  }
+  if (!trips.length) {
+    trips = (await request("/operator/trips", { silent: true })) || [];
+  }
+
+  const paidBookings = operatorBookings.filter((booking) => {
+    if (booking.status !== "Paid") return false;
+    const bookingDay = dateInputValue(booking.bookingDate);
+    if (fromDate && bookingDay < fromDate) return false;
+    if (toDate && bookingDay > toDate) return false;
+    return true;
+  });
+
+  const summary = paidBookings.reduce(
+    (acc, booking) => {
+      acc.paidBookings += 1;
+      acc.seatsSold += Number(booking.totalSeats || 0);
+      acc.paidRevenue += Number(booking.totalPrice || 0);
+      return acc;
+    },
+    { paidBookings: 0, seatsSold: 0, paidRevenue: 0 },
+  );
+
+  const normalizedGroup = groupBy === "bus" || groupBy === "date" ? groupBy : "trip";
+  const groups = new Map();
+
+  paidBookings.forEach((booking) => {
+    const trip = findTripForBooking(booking);
+    const routeParts = splitRoute(booking.route);
+    const bookingDay = dateInputValue(booking.bookingDate);
+    let key = "";
+    let base = {};
+
+    if (normalizedGroup === "bus") {
+      key = String(booking.busId || trip?.busId || booking.licensePlate || trip?.licensePlate || "unknown-bus");
+      base = {
+        busId: booking.busId || trip?.busId || null,
+        licensePlate: booking.licensePlate || trip?.licensePlate || "Chưa rõ biển số",
+        busType: booking.busType || trip?.busType || "Chưa rõ loại xe",
+        capacity: booking.capacity || trip?.capacity || "",
+      };
+    } else if (normalizedGroup === "date") {
+      key = bookingDay || "unknown-date";
+      base = { date: bookingDay };
+    } else {
+      key = String(booking.tripId || trip?.id || booking.route || "unknown-trip");
+      base = {
+        tripId: booking.tripId || trip?.id || null,
+        route: booking.route || "",
+        departureLocation: booking.departureLocation || trip?.departureLocation || routeParts.departure,
+        arrivalLocation: booking.arrivalLocation || trip?.arrivalLocation || routeParts.arrival,
+        departureTime: booking.departureTime || trip?.departureTime || booking.bookingDate,
+        licensePlate: booking.licensePlate || trip?.licensePlate || "Chưa rõ xe",
+      };
+    }
+
+    if (!groups.has(key)) {
+      groups.set(key, {
+        ...base,
+        paidBookings: 0,
+        seatsSold: 0,
+        revenue: 0,
+      });
+    }
+
+    const item = groups.get(key);
+    item.paidBookings += 1;
+    item.seatsSold += Number(booking.totalSeats || 0);
+    item.revenue += Number(booking.totalPrice || 0);
+  });
+
+  const items = [...groups.values()].sort((a, b) => {
+    if (normalizedGroup === "date") return String(b.date || "").localeCompare(String(a.date || ""));
+    return Number(b.revenue || 0) - Number(a.revenue || 0);
+  });
+
+  return {
+    groupBy: normalizedGroup,
+    filters: { from: fromDate, to: toDate },
+    summary,
+    items,
+  };
 }
 
 function revenueReportRow(groupBy, item) {
@@ -526,14 +692,15 @@ function revenueReportRow(groupBy, item) {
 }
 
 function revenueGroupLabel(groupBy, item) {
-  if (groupBy === "bus") return `XE-${item.busId}`;
+  if (groupBy === "bus") return item.busId ? `XE-${item.busId}` : item.licensePlate || "Xe chưa xác định";
   if (groupBy === "date") return dateOnly(item.date);
-  return `CX-${item.tripId}`;
+  return item.tripId ? `CX-${item.tripId}` : item.route || "Chuyến chưa xác định";
 }
 
 function revenueGroupDetail(groupBy, item) {
   if (groupBy === "bus") {
-    return `${escapeHtml(item.licensePlate)}<br><small>${escapeHtml(item.busType)} (${item.capacity} chỗ)</small>`;
+    const capacity = item.capacity ? ` (${item.capacity} chỗ)` : "";
+    return `${escapeHtml(item.licensePlate || "Chưa rõ biển số")}<br><small>${escapeHtml(item.busType || "Chưa rõ loại xe")}${capacity}</small>`;
   }
   if (groupBy === "date") {
     return "Doanh thu theo ngày đặt vé";
@@ -587,7 +754,24 @@ function renderRevenueChart(groupBy, items) {
 function revenueChartLabel(groupBy, item) {
   if (groupBy === "bus") return item.licensePlate || `XE-${item.busId}`;
   if (groupBy === "date") return dateOnly(item.date);
-  return `CX-${item.tripId}`;
+  return item.tripId ? `CX-${item.tripId}` : item.route || "Chuyến";
+}
+
+function findTripForBooking(booking) {
+  if (booking.tripId) {
+    const byId = trips.find((trip) => Number(trip.id) === Number(booking.tripId));
+    if (byId) return byId;
+  }
+
+  return trips.find((trip) => {
+    const route = `${trip.departureLocation} - ${trip.arrivalLocation}`;
+    return route === booking.route;
+  });
+}
+
+function splitRoute(route = "") {
+  const [departure = "", arrival = ""] = String(route).split(" - ");
+  return { departure, arrival };
 }
 
 window.openSeatMap = async function (busId) {
@@ -742,27 +926,58 @@ async function request(path, options = {}) {
       return null;
     }
     if (res.status === 403) {
-      showMessage(data.message || "Không có quyền truy cập");
+      if (!options.silent) showMessage(data.message || "Không có quyền truy cập");
       return null;
     }
     if (!res.ok) {
-      showMessage(data.message || "Có lỗi xảy ra");
+      if (!options.silent) showMessage(data.message || `Có lỗi xảy ra (${res.status})`);
       return null;
     }
     return data;
   } catch (error) {
     console.error(error);
-    showMessage("Không kết nối được Go API. Hãy chạy backend-go ở cổng 8080.");
+    if (!options.silent) showMessage("Không kết nối được Go API. Hãy chạy backend-go ở cổng 8080.");
     return null;
   }
 }
+
+function setText(id, text) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = text;
+}
+
+function showPanel(id) {
+  document.getElementById(id)?.classList.remove("hidden");
+}
+
+function hidePanel(id) {
+  document.getElementById(id)?.classList.add("hidden");
+}
+
+function togglePanel(id) {
+  document.getElementById(id)?.classList.toggle("hidden");
+}
+
+function operatorDisplayName() {
+  return user.fullName || user.operatorName || "Nhà xe";
+}
+
+function adminBadgeClass(status) {
+  if (status === "Paid" || status === "Completed" || status === "Active") return "badge-success";
+  if (status === "Pending" || status === "Scheduled" || status === "On-going") return "badge-warning";
+  return "badge-danger";
+}
+
+window.showDriverNotice = function () {
+  showMessage("Danh sách tài xế đang hiển thị theo giao diện quản lý giống admin.");
+};
 
 function value(id) {
   return document.getElementById(id).value.trim();
 }
 
 function showMessage(message) {
-  document.getElementById("message").textContent = message;
+  if (message) alert(message);
 }
 
 function logout(event) {

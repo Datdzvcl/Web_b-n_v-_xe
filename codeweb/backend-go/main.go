@@ -609,7 +609,8 @@ func (a *app) operatorBookings(w http.ResponseWriter, r *http.Request, user auth
 		SELECT
 			bk.BookingID, bk.CustomerName, bk.CustomerPhone, bk.TotalSeats,
 			bk.TotalPrice, bk.PaymentStatus, bk.BookingDate,
-			t.DepartureLocation, t.ArrivalLocation
+			t.TripID, t.DepartureLocation, t.ArrivalLocation, t.DepartureTime,
+			b.BusID, b.LicensePlate, b.BusType, b.Capacity
 		FROM Bookings bk
 		JOIN Trips t ON t.TripID = bk.TripID
 		JOIN Buses b ON b.BusID = t.BusID
@@ -624,22 +625,28 @@ func (a *app) operatorBookings(w http.ResponseWriter, r *http.Request, user auth
 
 	var bookings []map[string]any
 	for rows.Next() {
-		var id, seats int
-		var name, phone, status, dep, arr string
+		var id, seats, tripID, busID, capacity int
+		var name, phone, status, dep, arr, licensePlate, busType string
 		var total float64
-		var bookingDate time.Time
-		if err := rows.Scan(&id, &name, &phone, &seats, &total, &status, &bookingDate, &dep, &arr); err != nil {
+		var bookingDate, departureTime time.Time
+		if err := rows.Scan(&id, &name, &phone, &seats, &total, &status, &bookingDate, &tripID, &dep, &arr, &departureTime, &busID, &licensePlate, &busType, &capacity); err != nil {
 			writeError(w, err)
 			return
 		}
 		bookings = append(bookings, map[string]any{
 			"id":            id,
+			"tripId":        tripID,
+			"busId":         busID,
 			"customerName":  name,
 			"customerPhone": phone,
 			"totalSeats":    seats,
 			"totalPrice":    total,
 			"status":        status,
 			"bookingDate":   bookingDate,
+			"departureTime": departureTime,
+			"licensePlate":  licensePlate,
+			"busType":       busType,
+			"capacity":      capacity,
 			"route":         dep + " - " + arr,
 		})
 	}
